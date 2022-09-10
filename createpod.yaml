@@ -7,8 +7,8 @@ metadata:
 spec:
   containers:
   - name: ngnixcont
-    image: ngnix:latest
+    image: nginx
     ports:
     - containerPort: 80
-    
+
 
