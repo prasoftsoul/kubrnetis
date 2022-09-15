@@ -8,22 +8,22 @@ spec:
     matchLabels:
       app: mavenwebapp
   startegy: 
-    type: Recreate    
+    type: Recreate
   template:
-  metadata:
-    name: mavenwebapppod
-    labels: 
-      app: mavenwebapp
-  spec:
-    containers: 
-    - name: mavenwebappcont
-      image: prathapva/maven-web-application:1
-      ports:
-      - containerPort: 8080
+    metadata:
+      name: mavenwebapppod
+      labels:
+        app: mavenwebapp
+    spec:
+      containers:
+      - name: mavenwebappcont
+        image: prathapva/maven-web-application:1
+        ports:
+        - containerPort: 8080
 ---
-apiVersion: v1 
+apiVersion: v1
 kind: Service
-metadata: 
+metadata:
   name: mavenwebsvc
 spec:
   type: NodePort
@@ -31,7 +31,7 @@ selector:
   app: mavenwebapp
 ports:
 - port: 80
-  targetPort: 8080   
+  targetPort: 8080
 
 
                
