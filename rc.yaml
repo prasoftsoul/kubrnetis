@@ -13,7 +13,7 @@ spec:
         app: mavenwebapp
     spec:
       containers:
-      - name: mavenwebapp
+      - name: mavenwebcont
         image: prathapva/maven-web-application:1
         ports:
         - containerPort: 8080    
