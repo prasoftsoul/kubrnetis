@@ -13,19 +13,19 @@ spec:
       labels:
         app: springapp
     spec:
-    - containers:
-      name: springappcontainer
-      image: prathapva/javaspring:1
-      resources:
-        requests:
-          cpu: 200m
-          memory: 256Mi
-        limits:
-          cpu: "500m"
-          memory: "512Mi"  
-      port:
-      - containerPort: 8080
-      env:
+      containers:
+      - name: springappcontainer
+        image: prathapva/javaspring:1
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        env:
         - name: MONGO_DB_HOSTNAME
           value:  mongosvc
         - name: MONGO_DB_USERNAME
@@ -72,12 +72,24 @@ spec:
         - name: MONGO_INITDB_ROOT_PASSWORD
           value: devdb@123
         volumeMounts:
-        - name: mongodbhostvol
+        - name: mongodbvol
           mountPath: /data/db
       volumes: 
-      - name: mongodbhostvol
-        hostPath: 
-          path: /mongodata 
+      - name: mongodbvol
+        PersistentVolumeClaim: 
+          claimName: mongodbpvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodbpvc
+  namespace: test-ns
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
 ---
 apiVersion: v1
 kind: Service
