@@ -36,7 +36,7 @@ spec:
         - name: MONGO_DB_PASSWORD
           valueFrom: 
             configMapKeyRef:
-              name: springappconfig
+              name: springappsecret
               key: mongodbpassword
 ---
 apiVersion: v1
@@ -81,7 +81,7 @@ spec:
         - name: MONGO_INITDB_ROOT_PASSWORD
           valueFrom:
             configMapKeyRef:
-              name: springappconfig
+              name: springappsecret
               value: mongodbpassword
 ---
 apiVersion: v1
