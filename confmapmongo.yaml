@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: springapp
+  name: springappdeployment
   namespace: test-ns
 spec:
   replicas: 2
@@ -16,28 +16,28 @@ spec:
       containers:
       - name: springappcontainer
         image: prathapva/javaspring:1
-        resources:
-          requests:
-            cpu: 200m
-            memory: 256Mi
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        ports:
-        - containerPort: 8080
         env:
         - name: MONGO_DB_HOSTNAME
-          value:  mongosvc
+          value: mongosvc
         - name: MONGO_DB_USERNAME
           valueFrom:
             configMapKeyRef:
               name: springappconfig
               key: mongodbusername
         - name: MONGO_DB_PASSWORD
-          valueFrom: 
-            configMapKeyRef:
+          valueFrom:
+            secretKeyRef:
               name: springappsecret
               key: mongodbpassword
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+        ports:
+        - containerPort: 8080
 ---
 apiVersion: v1
 kind: Service
@@ -58,17 +58,17 @@ metadata:
   name: mongodb
   namespace: test-ns
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: mongo
   template:
     metadata:
-      name: myapp
       labels:
         app: mongo
     spec:
       containers:
-      - name: mongodbcontainer
+      - name: mongocontainer
         image: mongo
         ports:
         - containerPort: 27017
@@ -77,12 +77,19 @@ spec:
           valueFrom:
             configMapKeyRef:
               name: springappconfig
-              value: mongodbusername
+              key: mongodbusername
         - name: MONGO_INITDB_ROOT_PASSWORD
           valueFrom:
-            configMapKeyRef:
+            secretKeyRef:
               name: springappsecret
-              value: mongodbpassword
+              key:  mongodbpassword
+        volumeMounts:
+        - name: mongodbhostvol
+          mountPath: /data/db
+      volumes:
+      - name: mongodbhostvol
+        hostPath:
+          path: /tmp/mongo
 ---
 apiVersion: v1
 kind: Service
@@ -90,7 +97,6 @@ metadata:
   name: mongosvc
   namespace: test-ns
 spec:
-  type: ClusterIP
   selector:
     app: mongo
   ports:
